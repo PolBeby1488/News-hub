@@ -1,12 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>NewsHub</title>
-    <h1>NewsHub 📰</h1>
-    <p>Сайт работает</p>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="display-5 fw-bold">Свежие новости</h2>
+        <p class="lead text-muted">Будьте в курсе всех событий нашего сообщества.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="#" class="btn btn-success btn-lg shadow-sm">+ Добавить новость</a>
+    </div>
+</div>
+
+<hr>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-bold text-primary">Первая новость!</h5>
+                <p class="card-text text-secondary">Мы успешно запустили наш сервер на Flask и настроили базу данных.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <small class="text-muted">Автор: Admin</small>
+                <a href="#" class="btn btn-sm btn-outline-secondary">Читать далее</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col text-center py-5">
+        <div class="p-5 bg-light rounded-3 border border-dashed">
+            <p class="text-muted mb-0">Здесь появятся ваши новости после регистрации...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
