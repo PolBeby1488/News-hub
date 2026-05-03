@@ -1,22 +1,18 @@
-def is_prime(n):
-    if n <= 1:
-        return False
+import requests
 
-    for d in range(2, int(n ** 0.5) + 1):
-        if n % d == 0:
-            return False
+data = requests.get('http://127.0.0.1:8080').json()
 
-    return True
+all_v = []
+top = 0
+best = 0
 
+for i, row in enumerate(data):
+    c = len([n for n in row if 11 <= n <= 21])
+    if c >= best:
+        best = c
+        top = i
+    all_v += row
 
-try:
-    s = input().strip()
-    n = int(s)
-
-    if is_prime(n):
-        print("YES")
-    else:
-        print("NO")
-
-except (ValueError, EOFError):
-    print("NO")
+print(top)
+print(*sorted(set([x for x in all_v if 11 <= x <= 21])))
+print(max(all_v) - min(all_v))  

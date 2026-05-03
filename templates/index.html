@@ -1,36 +1,75 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="row align-items-center mb-4">
-    <div class="col-md-8">
-        <h2 class="display-5 fw-bold">Свежие новости</h2>
-        <p class="lead text-muted">Будьте в курсе всех событий нашего сообщества.</p>
-    </div>
-    <div class="col-md-4 text-md-end">
-        <a href="#" class="btn btn-success btn-lg shadow-sm">+ Добавить новость</a>
-    </div>
-</div>
 
-<hr>
-
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <h5 class="card-title fw-bold text-primary">Первая новость!</h5>
-                <p class="card-text text-secondary">Мы успешно запустили наш сервер на Flask и настроили базу данных.</p>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
-                <small class="text-muted">Автор: Admin</small>
-                <a href="#" class="btn btn-sm btn-outline-secondary">Читать далее</a>
+<div id="heroCarousel" class="carousel slide shadow mb-5" data-bs-ride="carousel">
+    <div class="carousel-inner" style="border-radius: 20px;">
+        <div class="carousel-item active" style="height: 400px;">
+            <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80" class="d-block w-100 h-100" style="object-fit: cover; filter: brightness(0.4);">
+            <div class="carousel-caption">
+                <h1 class="display-4 fw-bold">Главное сегодня</h1>
+                <p class="lead">Будьте в курсе событий с NewsHub</p>
             </div>
         </div>
     </div>
-    
-    <div class="col text-center py-5">
-        <div class="p-5 bg-light rounded-3 border border-dashed">
-            <p class="text-muted mb-0">Здесь появятся ваши новости после регистрации...</p>
+</div>
+
+<div class="container">
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-primary rounded-circle p-2 me-3"><i class="bi bi-lightning-fill text-white"></i></div>
+        <h2 class="fw-bold m-0">Свежее за сегодня</h2>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        {% for item in latest_news %}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm custom-card">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ item.title }}</h5>
+                    <p class="card-text text-muted">{{ item.content[:100] }}...</p>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3">
+                    <span class="badge bg-soft-primary text-primary">Новое</span>
+                    <small class="ms-2 text-muted">{{ item.author.username if not is_demo else item.author.username }}</small>
+                </div>
+            </div>
         </div>
+        {% endfor %}
+    </div>
+
+    <hr class="my-5 opacity-25">
+
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-warning rounded-circle p-2 me-3"><i class="bi bi-star-fill text-white"></i></div>
+        <h2 class="fw-bold m-0">Главные события года</h2>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% if yearly_news %}
+            {% for item in yearly_news %}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm custom-card yearly-card">
+                    <div class="card-body text-white">
+                        <h5 class="card-title fw-bold">{{ item.title }}</h5>
+                        <p class="card-text opacity-75 small">{{ item.content[:120] }}...</p>
+                    </div>
+                    <div class="card-footer border-0 pb-3 text-white-50">
+                        <i class="bi bi-award me-1"></i> Итоги 2026
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5 bg-white rounded shadow-sm">
+                <p class="text-muted m-0">Важные события года появятся здесь совсем скоро.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
+
+<style>
+    .custom-card { transition: 0.3s; border-radius: 15px; overflow: hidden; }
+    .custom-card:hover { transform: translateY(-7px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+    .bg-soft-primary { background-color: #e7f1ff; }
+    .yearly-card { background: linear-gradient(135deg, #212529 0%, #343a40 100%); border-top: 4px solid #ffc107 !important; }
+</style>
 {% endblock %}

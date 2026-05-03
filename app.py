@@ -1,10 +1,10 @@
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from models import db, User
-from forms import RegisterForm, LoginForm
+from models import db, User, News
+from forms import RegisterForm, LoginForm, NewsForm
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandex_lyceum_secret_key_123'
+app.config['SECRET_KEY'] = 'yandex_lyceum_secret_key_2026'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///news.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -26,7 +26,29 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    db_news = News.query.order_by(News.id.desc()).all()
+
+    # Если база пуста, показываем демо-контент
+    if not db_news:
+        latest_news = [
+            {"title": "Эволюция AI в 2026 году", "content": "Нейросети теперь интегрированы в каждый браузер.",
+             "author": {"username": "TechDaily"}}
+        ]
+        yearly_news = [
+            {"title": "Итоги года: Прорыв в квантах",
+             "content": "Ученые достигли стабильности кубитов при комнатной температуре.",
+             "author": {"username": "ScienceHub"}},
+            {"title": "Глобальное потепление 2026", "content": "Мировые лидеры подписали новое соглашение по экологии.",
+             "author": {"username": "EcoWatch"}},
+            {"title": "Марс: Первый жилой модуль", "content": "SpaceX успешно доставила оборудование для первой базы.",
+             "author": {"username": "MarsToday"}}
+        ]
+        return render_template('index.html', latest_news=latest_news, yearly_news=yearly_news, is_demo=True)
+
+    # Распределяем: первые 3 — свежие, следующие 3 — важные за год
+    latest = db_news[:3]
+    yearly = db_news[3:6]
+    return render_template('index.html', latest_news=latest, yearly_news=yearly, is_demo=False)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -38,15 +60,10 @@ def register():
         if User.query.filter_by(email=form.email.data).first():
             flash('Этот email уже занят', 'danger')
             return render_template('register.html', form=form)
-
-        user = User(
-            username=form.username.data,
-            email=form.email.data,
-            password_hash=form.password.data
-        )
+        user = User(username=form.username.data, email=form.email.data, password_hash=form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Регистрация успешна! Теперь войдите.', 'success')
+        flash('Регистрация успешна!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
@@ -60,10 +77,23 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.password_hash == form.password.data:
             login_user(user)
+            flash('С возвращением!', 'success')
             return redirect(url_for('index'))
-        else:
-            flash('Неверный email или пароль', 'danger')
+        flash('Неверный email или пароль', 'danger')
     return render_template('login.html', form=form)
+
+
+@app.route('/add_news', methods=['GET', 'POST'])
+@login_required
+def add_news():
+    form = NewsForm()
+    if form.validate_on_submit():
+        news = News(title=form.title.data, content=form.content.data, user_id=current_user.id)
+        db.session.add(news)
+        db.session.commit()
+        flash('Опубликовано!', 'success')
+        return redirect(url_for('index'))
+    return render_template('add_news.html', form=form)
 
 
 @app.route('/logout')
